@@ -56,7 +56,11 @@ const productSchema = new mongoose.Schema({
   Description: String,
   Category: String,
   Price: mongoose.Types.Decimal128,
-  Quantity: Number
+  Quantity: Number,
+  Available: {
+    type: String,
+    enum: ["In Stock", "Low in stock"],
+  },
 });
 
 const stockSchema = new mongoose.Schema({

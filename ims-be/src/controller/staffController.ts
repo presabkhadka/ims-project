@@ -1,4 +1,4 @@
-import { request, type Request, type Response } from "express";
+import { type Request, type Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -122,9 +122,10 @@ export async function addProduct(req: Request, res: Response) {
     });
 
     if (existingProduct) {
-      await existingProduct.updateOne({
-        $inc: { Quantity: Quantity },
-      });
+      existingProduct.Quantity += Quantity;
+      // @ts-ignore
+      existingProduct.Available =  existingProduct.Quantity <= 10 ? "Low in stock" : "In Stock";
+      await existingProduct.save();
       res.status(409).json({
         msg: `Product quantity updated by ${Quantity}`,
       });
@@ -223,6 +224,7 @@ export async function deleteProduct(req: Request, res: Response) {
 export async function fetchProduct(req: Request, res: Response) {
   try {
     let products = await Product.find({});
+
     if (products.length === 0) {
       res.status(404).json({
         msg: "no products found in our db, please add some products",
@@ -236,6 +238,25 @@ export async function fetchProduct(req: Request, res: Response) {
   } catch (error) {
     res.status(500).json({
       msg: "something went wrong with the server at the moment",
+    });
+  }
+}
+
+export async function fetchStock(req: Request, res: Response) {
+  try {
+    let stocks = await Product.find({}).select("_id Name Quantity Available");
+    if (stocks.length === 0) {
+      res.status(404).json({
+        msg: "no products found in stock",
+      });
+      return;
+    }
+    res.status(200).json({
+      stocks,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
     });
   }
 }

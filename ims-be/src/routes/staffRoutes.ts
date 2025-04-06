@@ -3,6 +3,7 @@ import {
   addProduct,
   deleteProduct,
   fetchProduct,
+  fetchStock,
   staffLogin,
   staffRegister,
   updateProduct,
@@ -20,6 +21,7 @@ staffRouter.delete(
   staffMiddleware,
   deleteProduct
 );
-staffRouter.get("/products", staffMiddleware, fetchProduct)
+staffRouter.get("/products", staffMiddleware, fetchProduct);
+staffRouter.get("/stocks", staffMiddleware, fetchStock);
 
 export { staffRouter };

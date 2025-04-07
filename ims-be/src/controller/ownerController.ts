@@ -159,6 +159,7 @@ export async function updateProduct(req: Request, res: Response) {
   try {
     let productId = req.params.productId;
     let { Name, Description, Category, Price, Quantity } = req.body;
+    let status;
 
     let fieldsToUpdate: Record<string, any> = {};
 
@@ -167,6 +168,9 @@ export async function updateProduct(req: Request, res: Response) {
     if (Category) fieldsToUpdate.Category = Category;
     if (Price) fieldsToUpdate.Price = Price;
     if (Quantity) fieldsToUpdate.Quantity = Quantity;
+    if (Quantity < 20 ? (status = "Low in stock") : (status = "In Stock")) {
+      fieldsToUpdate.Available = status;
+    }
 
     if (Object.keys(fieldsToUpdate).length === 0) {
       res.status(400).json({

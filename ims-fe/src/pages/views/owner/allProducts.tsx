@@ -23,32 +23,31 @@ export default function AllProduct() {
     const fetchProducts = async () => {
       try {
         let token = localStorage.getItem("Authorization")?.split(" ")[1];
-        if (!token) {
-          throw new Error("No authorization headers");
-        }
+        if (!token) throw new Error("No authorization headers");
+
         let response = await axios.get("http://localhost:1212/owner/products", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setProducts(response.data.products);
-      } catch (error) {}
+      } catch (error) {
+        toast.error("Failed to fetch products");
+      }
     };
     fetchProducts();
-    let interval = setInterval(fetchProducts, 2000);
+    const interval = setInterval(fetchProducts, 2000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleDeleteProduct = async (selectedProduct: any) => {
-    if (!selectedProduct) {
-      console.log("no treasure selected");
-    }
+  const handleDeleteProduct = async (selectedProduct: Products) => {
+    if (!selectedProduct) return;
+
     try {
       let token = localStorage.getItem("Authorization")?.split(" ")[1];
-      if (!token) {
-        throw new Error("No token in headers");
-      }
-      let response = await axios.delete(
+      if (!token) throw new Error("No token in headers");
+
+      await axios.delete(
         `http://localhost:1212/owner/delete-product/${selectedProduct._id}`,
         {
           headers: {
@@ -56,7 +55,8 @@ export default function AllProduct() {
           },
         }
       );
-      toast.success("Product delete successfully");
+
+      toast.success("Product deleted successfully");
     } catch (error) {
       toast.error("Couldn't delete product.");
     }
@@ -68,7 +68,7 @@ export default function AllProduct() {
         <Navbar />
       </div>
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
-        <div className="col-span-2 ">
+        <div className="col-span-2">
           <Sidebar />
         </div>
         <div className="col-span-10 overflow-y-auto">
@@ -123,12 +123,16 @@ export default function AllProduct() {
                     </div>
                   </div>
                   <div className="px-6 py-4 flex gap-2">
-                    <button className="w-full border border-blue-500  py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300">
+                    <button
+                      onClick={() => setSelectedProduct(product)}
+                      className="w-full border border-blue-500 py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300"
+                    >
                       Edit
                     </button>
-                    <button onClick={()=>{
-                      handleDeleteProduct(product)
-                    }} className="w-full border border-red-500  py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300">
+                    <button
+                      onClick={() => handleDeleteProduct(product)}
+                      className="w-full border border-red-500 py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300"
+                    >
                       Delete
                     </button>
                   </div>
@@ -138,6 +142,137 @@ export default function AllProduct() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-black p-6 rounded-md w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              Edit Product
+            </h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const token = localStorage
+                    .getItem("Authorization")
+                    ?.split(" ")[1];
+                  if (!token) throw new Error("No token found");
+
+                  const availableStatus =
+                    selectedProduct.Quantity < 20 ? "Low in stock" : "In Stock";
+
+                  const updatedProduct = {
+                    ...selectedProduct,
+                    Available: availableStatus,
+                  };
+
+                  const response = await axios.patch(
+                    `http://localhost:1212/owner/update-product/${selectedProduct._id}`,
+                    updatedProduct,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+
+                  if (response.status === 200) {
+                    toast.success("Product updated successfully");
+                    setSelectedProduct(null);
+                  } else {
+                    throw new Error("Unexpected response from server");
+                  }
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Failed to update product");
+                }
+              }}
+              className="space-y-4"
+            >
+              <input
+                type="text"
+                value={selectedProduct.Name}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    Name: e.target.value,
+                  })
+                }
+                placeholder="Name"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="text"
+                value={selectedProduct.Category}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    Category: e.target.value,
+                  })
+                }
+                placeholder="Category"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <textarea
+                value={selectedProduct.Description}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    Description: e.target.value,
+                  })
+                }
+                placeholder="Description"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="number"
+                value={parseFloat(selectedProduct.Price.$numberDecimal)}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    Price: { $numberDecimal: e.target.value },
+                  })
+                }
+                placeholder="Price"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="number"
+                value={selectedProduct.Quantity}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    Quantity: parseInt(e.target.value),
+                  })
+                }
+                placeholder="Quantity"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProduct(null)}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

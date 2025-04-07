@@ -66,7 +66,7 @@ export default function Stocks() {
                         Quantity
                       </TableHead>
                       <TableHead className="p-3 border dark:border-gray-600">
-                        Available
+                        Status
                       </TableHead>
                     </TableRow>
                   </TableHeader>

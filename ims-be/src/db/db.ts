@@ -1,4 +1,4 @@
-import mongoose, { mongo, Types } from "mongoose";
+import mongoose, { mongo, Types, Document } from "mongoose";
 
 mongoose.connect(
   "mongodb+srv://imsnepal123:WtvDl56tbW4R8Qao@cluster0.gjep52q.mongodb.net/IMS"

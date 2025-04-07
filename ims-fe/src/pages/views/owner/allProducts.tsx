@@ -3,6 +3,7 @@ import Navbar from "../../../components/navbar";
 import Sidebar from "../../../components/sidebar";
 import { Package2 } from "lucide-react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function AllProduct() {
   interface Products {
@@ -16,6 +17,7 @@ export default function AllProduct() {
   }
 
   const [products, setProducts] = useState<Products[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Products | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -36,6 +38,29 @@ export default function AllProduct() {
     let interval = setInterval(fetchProducts, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleDeleteProduct = async (selectedProduct: any) => {
+    if (!selectedProduct) {
+      console.log("no treasure selected");
+    }
+    try {
+      let token = localStorage.getItem("Authorization")?.split(" ")[1];
+      if (!token) {
+        throw new Error("No token in headers");
+      }
+      let response = await axios.delete(
+        `http://localhost:1212/owner/delete-product/${selectedProduct._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Product delete successfully");
+    } catch (error) {
+      toast.error("Couldn't delete product.");
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
@@ -101,7 +126,9 @@ export default function AllProduct() {
                     <button className="w-full border border-blue-500  py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300">
                       Edit
                     </button>
-                    <button className="w-full border border-red-500  py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300">
+                    <button onClick={()=>{
+                      handleDeleteProduct(product)
+                    }} className="w-full border border-red-500  py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300">
                       Delete
                     </button>
                   </div>

@@ -61,6 +61,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ["In Stock", "Low in stock"],
   },
+  Image: String,
 });
 
 const stockSchema = new mongoose.Schema({
@@ -108,6 +109,17 @@ const monthlyReportSchema = new mongoose.Schema({
   },
 });
 
+const notificationSchema = new mongoose.Schema(
+  {
+    Name: { type: String, required: true },
+    Available: { type: String, required: true },
+    cleared: { type: Boolean, default: false },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 export const Product = mongoose.model("Product", productSchema);
 export const Stock = mongoose.model("Stock", stockSchema);
 export const Order = mongoose.model("Order", orderSchema);
@@ -121,6 +133,7 @@ export const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 export const Owner = mongoose.model("Owner", ownerSchema);
 export const Staff = mongoose.model("Staff", staffSchema);
 export const Manager = mongoose.model("Manager", managerSchema);
+export const Notification = mongoose.model("Notification", notificationSchema);
 
 module.exports = {
   Product,
@@ -133,4 +146,5 @@ module.exports = {
   Owner,
   Staff,
   Manager,
+  Notification,
 };

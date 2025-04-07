@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
-import { Owner, Product } from "../db/db";
+import { Notification, Owner, Product, Staff } from "../db/db";
 
 dotenv.config();
 
@@ -92,7 +92,10 @@ export async function ownerLogin(req: Request, res: Response) {
       });
       return;
     } else {
-      let token = jwt.sign({userEmail}, process.env.JWT_SECRET || "defaultKey");
+      let token = jwt.sign(
+        { userEmail },
+        process.env.JWT_SECRET || "defaultKey"
+      );
       res.status(200).json({
         token,
       });
@@ -111,6 +114,7 @@ export async function addProduct(req: Request, res: Response) {
     let Category = req.body.Category;
     let Price = req.body.Price;
     let Quantity = req.body.Quantity;
+    let Available;
 
     if (!Name || !Description || !Category || !Price || !Quantity) {
       res.status(400).json({
@@ -124,22 +128,22 @@ export async function addProduct(req: Request, res: Response) {
     });
 
     if (existingProduct) {
-     existingProduct.Quantity += Quantity
-    // @ts-ignore
-     existingProduct.Available = existingProduct.Quantity <= 20 ? "Low in stock" : "In Stock"
-     await existingProduct.save()
       res.status(409).json({
-        msg: `Product quantity updated by ${Quantity}`,
+        msg: `Product ${Name} already exists, Try updating it.`,
       });
       return;
     } else {
-      await Product.create({
-        Name,
-        Description,
-        Category,
-        Price,
-        Quantity,
-      });
+      if (
+        Quantity < 20 ? (Available = "Low in stock") : (Available = "In Stock")
+      )
+        await Product.create({
+          Name,
+          Description,
+          Category,
+          Price,
+          Quantity,
+          Available,
+        });
       res.status(200).json({
         msg: "product created successfully",
       });
@@ -262,3 +266,65 @@ export async function fetchStock(req: Request, res: Response) {
   }
 }
 
+export async function userDetails(req: Request, res: Response) {
+  try {
+    const user = req.user;
+    if (!user) {
+      res.status(404).json({
+        msg: "bad authorization",
+      });
+      return;
+    }
+    let userDetails = await Owner.findOne({
+      userEmail: user,
+    }).select("userName userEmail");
+    res.status(200).json({
+      userDetails,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
+    });
+  }
+}
+
+export async function totalProducts(req: Request, res: Response) {
+  try {
+    let products = await Product.find({});
+    if (products.length === 0) {
+      res.status(404).json({
+        msg: "no products found in our db, please add some products",
+      });
+      return;
+    } else {
+      let totalProducts = products.length;
+      res.status(200).json({
+        totalProducts,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server at the moment",
+    });
+  }
+}
+
+export async function totalStaff(req: Request, res: Response) {
+  try {
+    let staff = await Staff.find({});
+    if (!staff) {
+      res.status(404).json({
+        msg: "no staffs found in our db",
+      });
+      return;
+    }
+    let totalStaff = staff.length;
+    res.status(200).json({
+      totalStaff,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server at the moment",
+    });
+  }
+}

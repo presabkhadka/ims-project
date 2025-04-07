@@ -7,6 +7,9 @@ import {
   deleteProduct,
   updateProduct,
   fetchStock,
+  userDetails,
+  totalProducts,
+  totalStaff,
 } from "../controller/ownerController";
 import ownerMiddleware from "../middleware/ownerMiddleware";
 
@@ -22,6 +25,9 @@ ownerRouter.delete(
   ownerMiddleware,
   deleteProduct
 );
-ownerRouter.get("/stocks", ownerMiddleware, fetchStock)
+ownerRouter.get("/stocks", ownerMiddleware, fetchStock);
+ownerRouter.get("/details", ownerMiddleware, userDetails);
+ownerRouter.get("/total-products", ownerMiddleware, totalProducts);
+ownerRouter.get("/total-staffs", ownerMiddleware, totalStaff);
 
 export { ownerRouter };

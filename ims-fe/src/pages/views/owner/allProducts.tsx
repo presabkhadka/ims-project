@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Navbar from "../../../components/navbar";
 import Sidebar from "../../../components/sidebar";
-import { Package2 } from "lucide-react";
+import { Package2, Search } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Input } from "../../../components/ui/input";
 
 export default function AllProduct() {
   interface Products {
@@ -18,6 +19,7 @@ export default function AllProduct() {
 
   const [products, setProducts] = useState<Products[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Products | null>(null);
+  const [searchQuery, setSearchQuery] = useState<any>("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -62,6 +64,12 @@ export default function AllProduct() {
     }
   };
 
+  const filteredProducts = products.filter(
+    (product) =>
+      product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.Category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
       <div className="top-0 sticky z-50 bg-white dark:bg-black">
@@ -73,12 +81,25 @@ export default function AllProduct() {
         </div>
         <div className="col-span-10 overflow-y-auto">
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Package2 className="h-6 w-6" />
-              Products
-            </h1>
+            <div className="flex gap-2 justify-between">
+              <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Package2 className="h-6 w-6" />
+                Products
+              </h1>
+              <div className="flex relative">
+                <div className="absolute mt-1 ml-1">
+                  <Search />
+                </div>
+                <Input
+                  className="pl-10"
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <div
                   key={product._id}
                   className="bg-white rounded-lg shadow-md dark:bg-muted/80 border hover:border-blue-500"

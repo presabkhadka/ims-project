@@ -43,6 +43,34 @@ export default function Stocks() {
     return () => clearInterval(interval);
   }, []);
 
+  const convertToCSV = (data: Stocks[]) => {
+    const headers = ["Product Name", "Quantity", "Status"];
+    const rows = data.map((stock) => [
+      stock.Name,
+      stock.Quantity,
+      stock.Available,
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    return csvContent;
+  };
+
+  const downloadCSV = () => {
+    const csv = convertToCSV(stocks);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "stocks.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col">
       <div className="top-0 sticky z-50 bg-white dark:bg-black">
@@ -55,6 +83,15 @@ export default function Stocks() {
         <div className="col-span-10 overflow-auto">
           <div className="p-6">
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="col-span-full flex justify-end">
+                <button
+                  onClick={downloadCSV}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                >
+                  Download CSV
+                </button>
+              </div>
+
               <div className="col-span-full ">
                 <Table className="w-full table-auto">
                   <TableHeader>

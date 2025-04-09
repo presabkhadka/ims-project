@@ -12,6 +12,8 @@ import AllProduct from "./pages/views/owner/allProducts";
 import AddProduct from "./pages/views/owner/addProduct";
 import { Toaster } from "react-hot-toast";
 import Stocks from "./pages/views/owner/stocks";
+import Suppliers from "./pages/views/owner/suppliers";
+import AddSuppliers from "./pages/views/owner/addSuppliers";
 
 function App() {
   return (
@@ -41,6 +43,14 @@ function App() {
               {
                 path: "/owner/stocks",
                 element: <Stocks/>
+              },
+              {
+                path: "/owner/suppliers",
+                element: <Suppliers/>
+              },
+              {
+                path: "/owner/add-suppliers",
+                element: <AddSuppliers/>
               }
             ],
           },

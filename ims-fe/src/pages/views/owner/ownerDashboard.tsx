@@ -9,7 +9,9 @@ import { Crown, User } from "lucide-react";
 export default function OwnerDashboard() {
   const [totalProduct, setTotalProduct] = useState(null);
   const [totalStaff, setTotalStaff] = useState(null);
+  const [totalSupplier, setTotalSupplier] = useState(null);
 
+  // ue for fetching total product
   useEffect(() => {
     const fetchTotalProduct = async () => {
       try {
@@ -35,8 +37,9 @@ export default function OwnerDashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // ue for fetching total staff
   useEffect(() => {
-    const fetchTotalProduct = async () => {
+    const fetchTotalStaff = async () => {
       try {
         let token = localStorage.getItem("Authorization")?.split(" ")[1];
         if (!token) {
@@ -55,11 +58,36 @@ export default function OwnerDashboard() {
         console.log(error);
       }
     };
-    fetchTotalProduct();
-    let interval = setInterval(fetchTotalProduct, 5000);
+    fetchTotalStaff();
+    let interval = setInterval(fetchTotalStaff, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  // ue for fetching total suppliers
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        let token = localStorage.getItem("Authorization")?.split(" ")[1];
+        if (!token) {
+          throw new Error("No authorization error");
+        }
+        let response = await axios.get(
+          "http://localhost:1212/owner/total-suppliers",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTotalSupplier(response.data.suppliers);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchSuppliers();
+    let interval = setInterval(fetchSuppliers, 5000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="h-screen w-screen flex flex-col">
       <div className="top-0 sticky z-50 bg-white dark:bg-black">
@@ -100,6 +128,23 @@ export default function OwnerDashboard() {
                     <div className="w-full flex justify-between items-center text-purple-500">
                       <h1 className="font-semibold text-2xl sm:text-2xl md:text-3xl">
                         {totalStaff}
+                      </h1>
+                      <User />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="rounded-xl shadow-lg  flex justify-center items-center hover:shadow-xl min-h-[10rem] border hover:border-pink-500">
+                {totalStaff === 0 ? (
+                  <Skeleton height={100} width="80%" />
+                ) : (
+                  <div className="w-full flex flex-col gap-2 py-2 px-4 justify-center items-center">
+                    <h1 className="font-bold text-xl sm:text-2xl md:text-2xl text-gray-800 dark:text-gray-200 self-start">
+                      Total Supplier
+                    </h1>
+                    <div className="w-full flex justify-between items-center text-pink-500">
+                      <h1 className="font-semibold text-2xl sm:text-2xl md:text-3xl">
+                        {totalSupplier}
                       </h1>
                       <User />
                     </div>

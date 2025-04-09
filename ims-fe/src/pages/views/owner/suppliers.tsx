@@ -3,6 +3,7 @@ import Navbar from "../../../components/navbar";
 import Sidebar from "../../../components/sidebar";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Suppliers() {
   interface Supplier {
@@ -14,6 +15,7 @@ export default function Suppliers() {
   }
 
   let [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  let [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
 
   // ue for fetching the suppliers
   useEffect(() => {
@@ -33,6 +35,28 @@ export default function Suppliers() {
     let interval = setInterval(fetchSupplier, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleDeleteSupplier = async (selectedSupplier: Supplier) => {
+    if (!selectedSupplier) return;
+
+    try {
+      let token = localStorage.getItem("Authorization")?.split(" ")[1];
+      if (!token) throw new Error("No token in headers");
+
+      await axios.delete(
+        `http://localhost:1212/owner/delete-supplier/${selectedSupplier._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Supplier deleted successfully");
+    } catch (error) {
+      toast.error("Couldn't delete supplier.");
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
@@ -93,10 +117,20 @@ export default function Suppliers() {
                     </div>
                   </div>
                   <div className="px-6 py-4 flex gap-2">
-                    <button className="w-full border border-blue-500 py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300">
+                    <button
+                      className="w-full border border-blue-500 py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300"
+                      onClick={() => {
+                        setSelectedSupplier(supplier);
+                      }}
+                    >
                       Edit
                     </button>
-                    <button className="w-full border border-red-500 py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300">
+                    <button
+                      className="w-full border border-red-500 py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300"
+                      onClick={() => {
+                        handleDeleteSupplier(supplier);
+                      }}
+                    >
                       Delete
                     </button>
                   </div>
@@ -106,6 +140,121 @@ export default function Suppliers() {
           </div>
         </div>
       </div>
+
+      {selectedSupplier && (
+        <div className="fixed inset-0  bg-muted/80 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-black p-6 rounded-md w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              Edit Product
+            </h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const token = localStorage
+                    .getItem("Authorization")
+                    ?.split(" ")[1];
+                  if (!token) throw new Error("No token found");
+
+                  const updatedProduct = {
+                    ...selectedSupplier,
+                  };
+
+                  const response = await axios.patch(
+                    `http://localhost:1212/owner/update-supplier/${selectedSupplier._id}`,
+                    updatedProduct,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+
+                  if (response.status === 200) {
+                    toast.success("Product updated successfully");
+                    setSelectedSupplier(null);
+                  } else {
+                    throw new Error("Unexpected response from server");
+                  }
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Failed to update product");
+                }
+              }}
+              className="space-y-4"
+            >
+              <input
+                type="text"
+                value={selectedSupplier.Name}
+                onChange={(e) =>
+                  setSelectedSupplier({
+                    ...selectedSupplier,
+                    Name: e.target.value,
+                  })
+                }
+                placeholder="Name"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="text"
+                value={selectedSupplier.Phone}
+                onChange={(e) =>
+                  setSelectedSupplier({
+                    ...selectedSupplier,
+                    Phone: e.target.value,
+                  })
+                }
+                placeholder="Phone"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="text"
+                value={selectedSupplier.Email}
+                onChange={(e) =>
+                  setSelectedSupplier({
+                    ...selectedSupplier,
+                    Email: e.target.value,
+                  })
+                }
+                placeholder="Email"
+                className="w-full border p-2 rounded"
+                required
+              />
+              <input
+                type="text"
+                value={selectedSupplier.Address}
+                onChange={(e) =>
+                  setSelectedSupplier({
+                    ...selectedSupplier,
+                    Address: e.target.value,
+                  })
+                }
+                placeholder="Address"
+                className="w-full border p-2 rounded"
+                required
+              />
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedSupplier(null)}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

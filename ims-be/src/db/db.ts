@@ -62,16 +62,10 @@ const productSchema = new mongoose.Schema({
     enum: ["In Stock", "Low in stock"],
   },
   Image: String,
-});
-
-const stockSchema = new mongoose.Schema({
-  BookingDate: Date,
-  Status: String,
-  ProductId: {
+  Supplier: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
+    ref: "Supplier",
   },
-  PurchaseAmount: mongoose.Types.Decimal128,
 });
 
 const inventorySchema = new mongoose.Schema({
@@ -80,10 +74,6 @@ const inventorySchema = new mongoose.Schema({
   ProductId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-  },
-  StockId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Stock",
   },
 });
 
@@ -109,19 +99,14 @@ const monthlyReportSchema = new mongoose.Schema({
   },
 });
 
-const notificationSchema = new mongoose.Schema(
-  {
-    Name: { type: String, required: true },
-    Available: { type: String, required: true },
-    cleared: { type: Boolean, default: false },
-  },
-  {
-    timestamps: true,
-  }
-);
+const supplierSchema = new mongoose.Schema({
+  Name: String,
+  Phone: String,
+  Email: String,
+  Address: String,
+});
 
 export const Product = mongoose.model("Product", productSchema);
-export const Stock = mongoose.model("Stock", stockSchema);
 export const Order = mongoose.model("Order", orderSchema);
 export const Inventory = mongoose.model("Inventory", inventorySchema);
 export const MonthlyReport = mongoose.model(
@@ -133,11 +118,10 @@ export const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 export const Owner = mongoose.model("Owner", ownerSchema);
 export const Staff = mongoose.model("Staff", staffSchema);
 export const Manager = mongoose.model("Manager", managerSchema);
-export const Notification = mongoose.model("Notification", notificationSchema);
+export const Supplier = mongoose.model("Supplier", supplierSchema);
 
 module.exports = {
   Product,
-  Stock,
   Order,
   Inventory,
   MonthlyReport,
@@ -146,5 +130,5 @@ module.exports = {
   Owner,
   Staff,
   Manager,
-  Notification,
+  Supplier,
 };

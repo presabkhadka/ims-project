@@ -4,6 +4,7 @@ import {
   PlusCircle,
   PackageSearch,
   ShoppingCart,
+  Truck,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -13,6 +14,8 @@ export default function Sidebar() {
     { to: "/owner/products", icon: Package, label: "All Products" },
     { to: "/owner/add-product", icon: PlusCircle, label: "Add New" },
     { to: "/owner/stocks", icon: PackageSearch, label: "Stocks" },
+    { to: "/owner/suppliers", icon: Truck, label: "Suppliers" },
+    { to: "/owner/add-suppliers", icon: Truck, label: "Add New Supplier" },
     { to: "/owner/orders", icon: ShoppingCart, label: "Orders" },
   ];
 

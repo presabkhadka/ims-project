@@ -10,6 +10,9 @@ import {
   userDetails,
   totalProducts,
   totalStaff,
+  addSupplier,
+  fetchSupplier,
+  totalSupplier,
 } from "../controller/ownerController";
 import ownerMiddleware from "../middleware/ownerMiddleware";
 
@@ -29,5 +32,8 @@ ownerRouter.get("/stocks", ownerMiddleware, fetchStock);
 ownerRouter.get("/details", ownerMiddleware, userDetails);
 ownerRouter.get("/total-products", ownerMiddleware, totalProducts);
 ownerRouter.get("/total-staffs", ownerMiddleware, totalStaff);
+ownerRouter.post("/add-supplier", ownerMiddleware, addSupplier);
+ownerRouter.get("/suppliers", ownerMiddleware, fetchSupplier);
+ownerRouter.get("/total-suppliers", ownerMiddleware, totalSupplier);
 
 export { ownerRouter };

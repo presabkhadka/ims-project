@@ -416,3 +416,78 @@ export async function totalSupplier(req: Request, res: Response) {
     });
   }
 }
+
+export async function updateSupplier(req: Request, res: Response) {
+  try {
+    let supplierId = req.params.supplierId;
+    let { Name, Phone, Email, Address } = req.body;
+
+    let fieldsToUpate: Record<string, any> = {};
+
+    if (!supplierId) {
+      res.status(404).json({
+        msg: "no supplier id in params",
+      });
+      return;
+    }
+
+    if (Name) fieldsToUpate.Name = Name;
+    if (Phone) fieldsToUpate.Phone = Phone;
+    if (Email) fieldsToUpate.Email = Email;
+    if (Address) fieldsToUpate.Address = Address;
+
+    if (Object.keys(fieldsToUpate).length === 0) {
+      res.status(404).json({
+        msg: "nothing there to update",
+      });
+      return;
+    }
+
+    let result = await Supplier.updateOne(
+      {
+        _id: supplierId,
+      },
+      {
+        $set: fieldsToUpate,
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      res.status(404).json({
+        msg: "no such supplier found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      msg: "supplier updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
+    });
+  }
+}
+
+export async function deleteSupplier(req: Request, res: Response) {
+  try {
+    let supplierId = req.params.supplierId;
+    if (!supplierId) {
+      res.status(404).json({
+        msg: "no supplier id passed in params",
+      });
+      return;
+    }
+    await Supplier.deleteOne({
+      _id: supplierId,
+    });
+
+    res.status(200).json({
+      msg: "supplier deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server at the moment",
+    });
+  }
+}

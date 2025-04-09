@@ -110,10 +110,16 @@ export default function AllProduct() {
                         {product.Name}
                       </h2>
                     </div>
-                    <p className="text-gray-600 mb-4 line-clamp-2 dark:text-white">
-                      {product.Description}
-                    </p>
                     <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 dark:text-white">
+                          Description
+                        </span>
+                        <p className="text-gray-600 line-clamp-2 dark:text-white">
+                          {product.Description}
+                        </p>
+                      </div>
+
                       <div className="flex justify-between items-center">
                         <span className="text-gray-500 dark:text-white">
                           Category

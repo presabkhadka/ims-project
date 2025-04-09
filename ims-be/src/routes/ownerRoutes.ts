@@ -13,6 +13,8 @@ import {
   addSupplier,
   fetchSupplier,
   totalSupplier,
+  updateSupplier,
+  deleteSupplier,
 } from "../controller/ownerController";
 import ownerMiddleware from "../middleware/ownerMiddleware";
 
@@ -35,5 +37,15 @@ ownerRouter.get("/total-staffs", ownerMiddleware, totalStaff);
 ownerRouter.post("/add-supplier", ownerMiddleware, addSupplier);
 ownerRouter.get("/suppliers", ownerMiddleware, fetchSupplier);
 ownerRouter.get("/total-suppliers", ownerMiddleware, totalSupplier);
+ownerRouter.patch(
+  "/update-supplier/:supplierId",
+  ownerMiddleware,
+  updateSupplier
+);
+ownerRouter.delete(
+  "/delete-supplier/:supplierId",
+  ownerMiddleware,
+  deleteSupplier
+);
 
 export { ownerRouter };

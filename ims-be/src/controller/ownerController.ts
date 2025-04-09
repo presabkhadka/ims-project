@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
-import { Notification, Owner, Product, Staff } from "../db/db";
+import { Owner, Product, Staff, Supplier } from "../db/db";
 
 dotenv.config();
 
@@ -329,6 +329,90 @@ export async function totalStaff(req: Request, res: Response) {
   } catch (error) {
     res.status(500).json({
       msg: "something went wrong with the server at the moment",
+    });
+  }
+}
+
+export async function addSupplier(req: Request, res: Response) {
+  try {
+    let Name = req.body.Name;
+    let Phone = req.body.Phone;
+    let Email = req.body.Email;
+    let Address = req.body.Address;
+
+    if (!Name || !Phone || !Email || !Address) {
+      res.status(401).json({
+        msg: "Input fields cannot be left empty",
+      });
+      return;
+    }
+
+    let existingSupplier = await Supplier.findOne({
+      Email,
+    });
+
+    if (existingSupplier) {
+      res.status(409).json({
+        msg: "Supplier already exists with that email",
+      });
+      return;
+    }
+
+    await Supplier.create({
+      Name,
+      Phone,
+      Email,
+      Address,
+    });
+
+    res.status(200).json({
+      msg: "supplier created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Something went wrong with the server",
+    });
+  }
+}
+
+export async function fetchSupplier(req: Request, res: Response) {
+  try {
+    let suppliers = await Supplier.find({});
+
+    if (!suppliers) {
+      res.status(404).json({
+        msg: "no suppliers found in our db",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      suppliers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
+    });
+  }
+}
+
+export async function totalSupplier(req: Request, res: Response) {
+  try {
+    let suppliers = (await Supplier.find({})).length;
+
+    if (!suppliers) {
+      res.status(404).json({
+        msg: "no suppliers found in our db",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      suppliers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
     });
   }
 }

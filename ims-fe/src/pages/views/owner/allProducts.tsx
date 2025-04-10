@@ -20,6 +20,7 @@ export default function AllProduct() {
   const [products, setProducts] = useState<Products[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Products | null>(null);
   const [searchQuery, setSearchQuery] = useState<any>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -35,6 +36,8 @@ export default function AllProduct() {
         setProducts(response.data.products);
       } catch (error) {
         toast.error("Failed to fetch products");
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -70,6 +73,22 @@ export default function AllProduct() {
       product.Category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const ProductSkeleton = () => (
+    <div className="bg-white dark:bg-muted/80 rounded-lg shadow-md border p-6 animate-pulse">
+      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+      <div className="space-y-3">
+        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/3"></div>
+      </div>
+      <div className="flex gap-2 mt-6">
+        <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+        <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
       <div className="top-0 sticky z-50 bg-white dark:bg-black">
@@ -99,72 +118,76 @@ export default function AllProduct() {
               </div>
             </div>
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product._id}
-                  className="bg-white rounded-lg shadow-md dark:bg-muted/80 border hover:border-blue-500"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <h2 className="text-xl font-semibold text-gray-800 line-clamp-1 dark:text-white">
-                        {product.Name}
-                      </h2>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500 dark:text-white">
-                          Description
-                        </span>
-                        <p className="text-gray-600 line-clamp-2 dark:text-white">
-                          {product.Description}
-                        </p>
-                      </div>
+              {loading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <ProductSkeleton key={i} />
+                  ))
+                : filteredProducts.map((product) => (
+                    <div
+                      key={product._id}
+                      className="bg-white rounded-lg shadow-md dark:bg-muted/80 border hover:border-blue-500"
+                    >
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <h2 className="text-xl font-semibold text-gray-800 line-clamp-1 dark:text-white">
+                            {product.Name}
+                          </h2>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex flex-col">
+                            <span className="text-gray-500 dark:text-white">
+                              Description:
+                            </span>
+                            <p className="text-gray-800 line-clamp-2 dark:text-gray-400 font-medium">
+                              {product.Description}
+                            </p>
+                          </div>
 
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-500 dark:text-white">
-                          Category
-                        </span>
-                        <span className="font-medium text-gray-800 dark:text-white">
-                          {product.Category}
-                        </span>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500 dark:text-white">
+                              Category
+                            </span>
+                            <span className="font-medium text-gray-800 dark:text-white">
+                              {product.Category}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500 dark:text-white">
+                              Price
+                            </span>
+                            <span className="font-medium text-gray-800 dark:text-white">
+                              $
+                              {parseFloat(
+                                product.Price?.$numberDecimal || "0.0"
+                              ).toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-500 dark:text-white">
+                              Quantity
+                            </span>
+                            <span className="font-medium text-gray-800 dark:text-white">
+                              {product.Quantity}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-500 dark:text-white">
-                          Price
-                        </span>
-                        <span className="font-medium text-gray-800 dark:text-white">
-                          $
-                          {parseFloat(
-                            product.Price?.$numberDecimal || "0.0"
-                          ).toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-500 dark:text-white">
-                          Quantity
-                        </span>
-                        <span className="font-medium text-gray-800 dark:text-white">
-                          {product.Quantity}
-                        </span>
+                      <div className="px-6 py-4 flex gap-2">
+                        <button
+                          onClick={() => setSelectedProduct(product)}
+                          className="w-full border border-blue-500 py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product)}
+                          className="w-full border border-red-500 py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <div className="px-6 py-4 flex gap-2">
-                    <button
-                      onClick={() => setSelectedProduct(product)}
-                      className="w-full border border-blue-500 py-2 px-4 rounded-md hover:bg-blue-700 hover:text-white transition-colors duration-300"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product)}
-                      className="w-full border border-red-500 py-2 px-4 rounded-md hover:bg-red-700 hover:text-white transition-colors duration-300"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  ))}
             </div>
           </div>
         </div>

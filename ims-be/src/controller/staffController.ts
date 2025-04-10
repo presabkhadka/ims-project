@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
-import { Product, Staff } from "../db/db";
+import { Order, Product, Staff, Supplier } from "../db/db";
 
 dotenv.config();
 
@@ -109,6 +109,7 @@ export async function addProduct(req: Request, res: Response) {
     let Category = req.body.Category;
     let Price = req.body.Price;
     let Quantity = req.body.Quantity;
+    let Available;
 
     if (!Name || !Description || !Category || !Price || !Quantity) {
       res.status(400).json({
@@ -122,22 +123,22 @@ export async function addProduct(req: Request, res: Response) {
     });
 
     if (existingProduct) {
-      existingProduct.Quantity += Quantity;
-      // @ts-ignore
-      existingProduct.Available =  existingProduct.Quantity <= 10 ? "Low in stock" : "In Stock";
-      await existingProduct.save();
       res.status(409).json({
-        msg: `Product quantity updated by ${Quantity}`,
+        msg: "Product already exists try editing the product",
       });
       return;
     } else {
-      await Product.create({
-        Name,
-        Description,
-        Category,
-        Price,
-        Quantity,
-      });
+      if (
+        Quantity <= 20 ? (Available = "Low in stock") : (Available = "In Stock")
+      )
+        await Product.create({
+          Name,
+          Description,
+          Category,
+          Price,
+          Quantity,
+          Available,
+        });
       res.status(200).json({
         msg: "product created successfully",
       });
@@ -153,6 +154,7 @@ export async function updateProduct(req: Request, res: Response) {
   try {
     let productId = req.params.productId;
     let { Name, Description, Category, Price, Quantity } = req.body;
+    let status;
 
     let fieldsToUpdate: Record<string, any> = {};
 
@@ -161,6 +163,9 @@ export async function updateProduct(req: Request, res: Response) {
     if (Category) fieldsToUpdate.Category = Category;
     if (Price) fieldsToUpdate.Price = Price;
     if (Quantity) fieldsToUpdate.Quantity = Quantity;
+    if (Quantity <= 20 ? (status = "Low in stock") : (status = "In Stock")) {
+      fieldsToUpdate.Available = status;
+    }
 
     if (Object.keys(fieldsToUpdate).length === 0) {
       res.status(400).json({
@@ -261,3 +266,90 @@ export async function fetchStock(req: Request, res: Response) {
   }
 }
 
+export async function fetchDetails(req: Request, res: Response) {
+  try {
+    const user = req.user;
+    if (!user) {
+      res.status(404).json({
+        msg: "Authorization failed",
+      });
+      return;
+    }
+    let staff = await Staff.findOne({
+      userEmail: user,
+    }).select("userName userEmail");
+
+    res.status(200).json({
+      staff,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server",
+    });
+  }
+}
+
+export async function totalProductStaff(req: Request, res: Response) {
+  try {
+    let products = await Product.find({});
+
+    if (products.length === 0) {
+      res.status(404).json({
+        msg: "no products found in our db, please add some products",
+      });
+      return;
+    } else {
+      let totalProduct = products.length;
+      res.status(200).json({
+        totalProduct,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      msg: "something went wrong with the server at the moment",
+    });
+  }
+}
+
+export async function totalOrder(req: Request, res: Response) {
+  try {
+    let order = await Order.find({});
+    if (!order) {
+      res.status(404).json({
+        msg: "no orders found in our db",
+      });
+      return;
+    }
+    let totalOrder = order.length;
+
+    res.status(200).json({
+      totalOrder,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      res.status(500).json({
+        msg: error.message,
+      });
+  }
+}
+
+export async function getSupplier(req: Request, res: Response) {
+  try {
+    let suppliers = await Supplier.find({});
+    if (!suppliers) {
+      res.status(404).json({
+        msg: "no supplier found in our db",
+      });
+      return;
+    }
+    res.status(200).json({
+      suppliers,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        msg: error.message,
+      });
+    }
+  }
+}

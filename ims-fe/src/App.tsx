@@ -14,6 +14,10 @@ import { Toaster } from "react-hot-toast";
 import Stocks from "./pages/views/owner/stocks";
 import Suppliers from "./pages/views/owner/suppliers";
 import AddSuppliers from "./pages/views/owner/addSuppliers";
+import StaffAllProduct from "./pages/views/staff/staffProduct";
+import StaffAddProduct from "./pages/views/staff/staffAddProduct";
+import StaffStocks from "./pages/views/staff/staffStocks";
+import StaffSuppliers from "./pages/views/staff/staffSuppliers";
 
 function App() {
   return (
@@ -42,16 +46,16 @@ function App() {
               },
               {
                 path: "/owner/stocks",
-                element: <Stocks/>
+                element: <Stocks />,
               },
               {
                 path: "/owner/suppliers",
-                element: <Suppliers/>
+                element: <Suppliers />,
               },
               {
                 path: "/owner/add-suppliers",
-                element: <AddSuppliers/>
-              }
+                element: <AddSuppliers />,
+              },
             ],
           },
           {
@@ -61,6 +65,22 @@ function App() {
               {
                 path: "/staff/dashboard",
                 element: <StaffDashboard />,
+              },
+              {
+                path: "/staff/products",
+                element: <StaffAllProduct />,
+              },
+              {
+                path: "/staff/add-products",
+                element: <StaffAddProduct />,
+              },
+              {
+                path: "/staff/stocks",
+                element: <StaffStocks />,
+              },
+              {
+                path: "/staff/suppliers",
+                element: <StaffSuppliers />,
               },
             ],
           },

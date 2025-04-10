@@ -11,6 +11,7 @@ import {
   updateProduct,
   totalOrder,
   getSupplier,
+  totalSupplier,
 } from "../controller/staffController";
 import staffMiddleware from "../middleware/staffMiddleware";
 
@@ -31,5 +32,6 @@ staffRouter.get("/details", staffMiddleware, fetchDetails);
 staffRouter.get("/total-products", staffMiddleware, totalProductStaff);
 staffRouter.get("/total-orders", staffMiddleware, totalOrder);
 staffRouter.get("/suppliers", staffMiddleware, getSupplier);
+staffRouter.get("/total-suppliers", staffMiddleware, totalSupplier);
 
 export { staffRouter };

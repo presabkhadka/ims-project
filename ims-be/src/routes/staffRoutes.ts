@@ -2,11 +2,15 @@ import { Router, type Request, type Response } from "express";
 import {
   addProduct,
   deleteProduct,
+  fetchDetails,
   fetchProduct,
   fetchStock,
   staffLogin,
   staffRegister,
+  totalProductStaff,
   updateProduct,
+  totalOrder,
+  getSupplier,
 } from "../controller/staffController";
 import staffMiddleware from "../middleware/staffMiddleware";
 
@@ -23,5 +27,9 @@ staffRouter.delete(
 );
 staffRouter.get("/products", staffMiddleware, fetchProduct);
 staffRouter.get("/stocks", staffMiddleware, fetchStock);
+staffRouter.get("/details", staffMiddleware, fetchDetails);
+staffRouter.get("/total-products", staffMiddleware, totalProductStaff);
+staffRouter.get("/total-orders", staffMiddleware, totalOrder);
+staffRouter.get("/suppliers", staffMiddleware, getSupplier);
 
 export { staffRouter };

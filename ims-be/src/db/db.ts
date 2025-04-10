@@ -10,17 +10,7 @@ const staffSchema = new mongoose.Schema({
   userPassword: String,
   userType: {
     type: String,
-    enum: ["staff"],
-  },
-});
-
-const managerSchema = new mongoose.Schema({
-  userName: String,
-  userEmail: String,
-  userPassword: String,
-  userType: {
-    type: String,
-    enum: ["manager"],
+    enum: ["staff", "manager"],
   },
 });
 
@@ -68,15 +58,6 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-const inventorySchema = new mongoose.Schema({
-  AvailableItems: Number,
-  UpdateDate: Date,
-  ProductId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-  },
-});
-
 const orderItemSchema = new mongoose.Schema({
   Quantity: Number,
   UnitPrice: mongoose.Types.Decimal128,
@@ -90,15 +71,6 @@ const orderItemSchema = new mongoose.Schema({
   },
 });
 
-const monthlyReportSchema = new mongoose.Schema({
-  TotalSales: mongoose.Types.Decimal128,
-  TotalPurchase: mongoose.Types.Decimal128,
-  StockId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Stock",
-  },
-});
-
 const supplierSchema = new mongoose.Schema({
   Name: String,
   Phone: String,
@@ -108,27 +80,18 @@ const supplierSchema = new mongoose.Schema({
 
 export const Product = mongoose.model("Product", productSchema);
 export const Order = mongoose.model("Order", orderSchema);
-export const Inventory = mongoose.model("Inventory", inventorySchema);
-export const MonthlyReport = mongoose.model(
-  "MonthlyReport",
-  monthlyReportSchema
-);
 export const Customer = mongoose.model("Customer", customerSchema);
 export const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 export const Owner = mongoose.model("Owner", ownerSchema);
 export const Staff = mongoose.model("Staff", staffSchema);
-export const Manager = mongoose.model("Manager", managerSchema);
 export const Supplier = mongoose.model("Supplier", supplierSchema);
 
 module.exports = {
   Product,
   Order,
-  Inventory,
-  MonthlyReport,
   Customer,
   OrderItem,
   Owner,
   Staff,
-  Manager,
   Supplier,
 };

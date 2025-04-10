@@ -27,6 +27,8 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<Product[]>([]);
   const navigate = useNavigate();
 
+  let role = localStorage.getItem("UserRole");
+
   // Fetch user details
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -109,12 +111,15 @@ export default function Navbar() {
           </PopoverTrigger>
           <PopoverContent>
             <div className="flex flex-col gap-2">
-              <div>
+              <div className="flex flex-col gap-2">
                 <p className="text-sm text-slate-600 dark:text-white">
                   Name: {user?.userName}
                 </p>
                 <p className="text-sm text-slate-600 dark:text-white">
                   Email: {user?.userEmail}
+                </p>
+                <p className="text-sm text-slate-600 dark:text-white">
+                  Role: {role}
                 </p>
               </div>
               <button

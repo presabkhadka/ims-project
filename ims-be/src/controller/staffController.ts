@@ -353,3 +353,24 @@ export async function getSupplier(req: Request, res: Response) {
     }
   }
 }
+
+export async function totalSupplier(req: Request, res: Response) {
+  try {
+    let suppliers = (await Supplier.find({})).length;
+    if (!suppliers) {
+      res.status(404).json({
+        msg: "no supplier found in our db",
+      });
+      return;
+    }
+    res.status(200).json({
+      suppliers,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        msg: error.message,
+      });
+    }
+  }
+}

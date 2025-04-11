@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
-import { Order, Product, Staff, Supplier } from "../db/db";
+import { Customer, Order, OrderItem, Product, Staff, Supplier } from "../db/db";
+import axios, { responseEncoding } from "axios";
+import { overwriteMiddlewareResult } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
@@ -369,6 +372,181 @@ export async function totalSupplier(req: Request, res: Response) {
     }
     res.status(200).json({
       suppliers,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        msg: error.message,
+      });
+    }
+  }
+}
+
+export async function createOrder(req: Request, res: Response) {
+  try {
+    const { data } = await axios.get(
+      "https://dummyjson.com/c/deda-383d-4301-a302"
+    );
+
+    const orders = [];
+
+    for (const item of data.orders) {
+      const existingOrder = await Order.findOne({
+        ExternalOrderId: item.orderId,
+      });
+      if (existingOrder) {
+        console.log(`Order already exists for external ID: ${item.orderId}`);
+        continue;
+      }
+
+      let customer = await Customer.findOne({ Email: item.customerEmail });
+      if (!customer) {
+        customer = await Customer.create({
+          Name: item.customerName,
+          Email: item.customerEmail,
+          Address: "Unknown",
+          Phone: "0000000000",
+        });
+      }
+
+      const product = await Product.findOne({ Name: item.productName });
+      if (!product) {
+        console.warn(`Product not found: ${item.productName}`);
+        continue;
+      }
+
+      const order = await Order.create({
+        Date: new Date(),
+        Status: "Pending",
+        DeliveryMethod: "Home Delivery",
+        Customer: customer._id,
+        Employee: null,
+        ExternalOrderId: item.orderId,
+      });
+
+      const orderItem = await OrderItem.create({
+        Quantity: item.quantity,
+        UnitPrice: item.unitPrice,
+        ProductId: product._id,
+        OrderId: order._id,
+      });
+
+      orders.push({
+        orderId: order._id,
+        customerName: customer.Name,
+        productName: product.Name,
+        quantity: orderItem.Quantity,
+        unitPrice: orderItem.UnitPrice,
+        // @ts-ignore
+        totalPrice: orderItem.Quantity * orderItem.UnitPrice,
+        DeliveryMethod: order.DeliveryMethod,
+        Status: order.Status,
+      });
+    }
+
+    res.status(200).json({
+      msg: "Orders placed successfully",
+      orders,
+    });
+  } catch (error) {
+    console.error("Failed to create order:", error);
+    res.status(500).json({
+      msg: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function getOrder(req: Request, res: Response) {
+  try {
+    let orders = await Order.find({}).populate({
+      path: "Customer",
+      select: "Name",
+    });
+    if (!orders) {
+      res.status(404).json({
+        msg: "no orders found in our db",
+      });
+      return;
+    }
+    res.status(200).json({
+      orders,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ msg: error.message });
+    }
+  }
+}
+
+export async function createOrderManual(req: Request, res: Response) {
+  try {
+    let user = req.user;
+    if (!user) {
+      res.status(401).json({
+        msg: "Unauthorized access",
+      });
+      return;
+    }
+    let date = new Date();
+    let Status = req.body.Status;
+    let DeliveryMethod = req.body.DeliveryMethod;
+    let customerName = req.body.customerName;
+    let employee = await Staff.findOne({
+      userEmail: user,
+    });
+    let Employee = employee?._id;
+    let ExternalOrderId = uuidv4();
+    let productName = req.body.productName;
+    let product = await Product.findOne({
+      Name: productName,
+    });
+    if (!product) {
+      res.status(404).json({
+        msg: "product not found in stock, please check stock and try again",
+      });
+      return;
+    }
+    let customer = await Customer.findOne({
+      Name: customerName,
+    });
+    if (!customer) {
+      await Customer.create({
+        Name: customerName,
+      });
+    }
+    let Quantity = req.body.Quantity;
+    let price = product.Price;
+    let productId = product?._id;
+
+    if (!Date || !Status || !DeliveryMethod || !customerName) {
+      res.status(404).json({
+        msg: "input fields cannot be left empty",
+      });
+      return;
+    }
+
+    let order = await Order.create({
+      Date: date,
+      Status,
+      DeliveryMethod,
+      Customer: customer?._id,
+      Employee,
+      ExternalOrderId,
+    });
+
+    // @ts-ignore
+    let totalPrice = Quantity * price;
+
+    let orderItem = await OrderItem.create({
+      Quantity,
+      UnitPrice: price,
+      ProductId: productId,
+      OrderId: order._id,
+      TotalPrice: totalPrice,
+    });
+
+    res.status(200).json({
+      msg: "order created successfully",
     });
   } catch (error) {
     if (error instanceof Error) {

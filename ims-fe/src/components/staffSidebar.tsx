@@ -12,7 +12,6 @@ export default function StaffSideBar() {
   const menuItems = [
     { to: "/staff/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/staff/products", icon: Package, label: "All Products" },
-    { to: "/staff/add-products", icon: PlusCircle, label: "Add New" },
     { to: "/staff/stocks", icon: PackageSearch, label: "Stocks" },
     { to: "/staff/suppliers", icon: Truck, label: "Suppliers" },
     { to: "/staff/orders", icon: ShoppingCart, label: "Orders" },

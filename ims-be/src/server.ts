@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use("/staff", staffRouter);
 app.use("/manager", managerRouter);
-app.use("/owner", ownerRouter)
+app.use("/owner", ownerRouter);
 
 app.listen(port, () => {
   console.log(`server running at ${port}`);

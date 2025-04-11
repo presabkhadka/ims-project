@@ -1,7 +1,7 @@
 import { Input } from "../../../components/ui/input";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import axios from "axios";
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface RegisterFormInterface {
@@ -15,6 +15,10 @@ interface RegisterFormInterface {
   setUserPassword: React.Dispatch<React.SetStateAction<string>>;
   userName: string;
   setUserName: React.Dispatch<React.SetStateAction<string>>;
+  firstName: string;
+  setFirstName: React.Dispatch<React.SetStateAction<string>>;
+  lastName: string;
+  setLastName: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const RegisterForm: FC<RegisterFormInterface> = ({
@@ -28,12 +32,46 @@ const RegisterForm: FC<RegisterFormInterface> = ({
   setUserPassword,
   userName,
   setUserName,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
 }) => {
   return (
     <form
       onSubmit={handleSubmit}
       className="flex flex-col gap-2 w-full max-w-md"
     >
+      <div className="flex flex-col">
+        <label htmlFor="firstname" className="mb-2 font-medium">
+          First Name
+        </label>
+        <Input
+          type="text"
+          id="firstName"
+          className="border p-2 rounded-lg outline-blue-200"
+          placeholder="Enter your first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="flex flex-col">
+        <label htmlFor="lastname" className="mb-2 font-medium">
+          Last Name
+        </label>
+        <Input
+          type="text"
+          id="lastName"
+          className="border p-2 rounded-lg outline-blue-200"
+          placeholder="Enter your last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+      </div>
+
       <div className="flex flex-col">
         <label htmlFor="username" className="mb-2 font-medium">
           Username
@@ -48,6 +86,7 @@ const RegisterForm: FC<RegisterFormInterface> = ({
           required
         />
       </div>
+
       <div className="flex flex-col">
         <label htmlFor="email" className="mb-2 font-medium">
           Email
@@ -141,6 +180,8 @@ const RegisterForm: FC<RegisterFormInterface> = ({
 };
 
 const StaffRegister: FC = () => {
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [userPassword, setUserPassword] = useState<string>("");
@@ -175,6 +216,8 @@ const StaffRegister: FC = () => {
     e.preventDefault();
 
     const payload = {
+      firstName,
+      lastName,
       userName,
       userEmail,
       userPassword,
@@ -211,6 +254,10 @@ const StaffRegister: FC = () => {
           setUserPassword={setUserPassword}
           userName={userName}
           setUserName={setUserName}
+          firstName={firstName}
+          setFirstName={setFirstName}
+          lastName={lastName}
+          setLastName={setLastName}
         />
       </div>
     </div>

@@ -18,6 +18,15 @@ import StaffAllProduct from "./pages/views/staff/staffProduct";
 import StaffAddProduct from "./pages/views/staff/staffAddProduct";
 import StaffStocks from "./pages/views/staff/staffStocks";
 import StaffSuppliers from "./pages/views/staff/staffSuppliers";
+import ManagerAuthGuard from "./guards/managerAuthGuard";
+import ManagerLogin from "./pages/auth/manager/managerLogin";
+import ManagerRegister from "./pages/auth/manager/managerRegister";
+import ManagerDashboard from "./pages/views/manager/managerDashboard";
+import AllProductManager from "./pages/views/manager/productsManager";
+import AddProductManager from "./pages/views/manager/addProductManager";
+import StocksManager from "./pages/views/manager/managerStocks";
+import SuppliersManager from "./pages/views/manager/managerSuppliers";
+import AddSuppliersManager from "./pages/views/manager/managerAddSuppliers";
 
 function App() {
   return (
@@ -28,6 +37,14 @@ function App() {
           { path: "/owner/signup", element: <OwnerRegister /> },
           { path: "/staff/login", element: <StaffLogin /> },
           { path: "/staff/signup", element: <StaffRegister /> },
+          {
+            path: "/manager/login",
+            element: <ManagerLogin />,
+          },
+          {
+            path: "/manager/signup",
+            element: <ManagerRegister />,
+          },
           {
             path: "/owner",
             element: <OwnerAuthGuard />,
@@ -71,16 +88,42 @@ function App() {
                 element: <StaffAllProduct />,
               },
               {
-                path: "/staff/add-products",
-                element: <StaffAddProduct />,
-              },
-              {
                 path: "/staff/stocks",
                 element: <StaffStocks />,
               },
               {
                 path: "/staff/suppliers",
                 element: <StaffSuppliers />,
+              },
+            ],
+          },
+          {
+            path: "/manager",
+            element: <ManagerAuthGuard />,
+            children: [
+              {
+                path: "/manager/dashboard",
+                element: <ManagerDashboard />,
+              },
+              {
+                path: "/manager/products",
+                element: <AllProductManager />,
+              },
+              {
+                path: "/manager/add-product",
+                element: <AddProductManager />,
+              },
+              {
+                path: "/manager/stocks",
+                element: <StocksManager />,
+              },
+              {
+                path: "/manager/suppliers",
+                element: <SuppliersManager />,
+              },
+              {
+                path: "/manager/add-suppliers",
+                element: <AddSuppliersManager />,
               },
             ],
           },

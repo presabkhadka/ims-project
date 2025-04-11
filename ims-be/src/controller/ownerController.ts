@@ -9,12 +9,14 @@ dotenv.config();
 
 export async function ownerSignup(req: Request, res: Response) {
   try {
+    let firstName = req.body.firstName;
+    let lastName = req.body.lastName;
     let userName = req.body.userName;
     let userEmail = req.body.userEmail;
     let userPassword = req.body.userPassword;
     let userType = "owner";
 
-    if (!userName || !userEmail || !userPassword) {
+    if (!userName || !userEmail || !userPassword || !firstName || !lastName) {
       res.status(404).json({
         msg: "input fields cannot be left empty",
       });
@@ -33,6 +35,8 @@ export async function ownerSignup(req: Request, res: Response) {
     } else {
       let hashedPassword = await bcrypt.hash(userPassword, 10);
       await Owner.create({
+        firstName,
+        lastName,
         userName,
         userEmail,
         userPassword: hashedPassword,
@@ -281,7 +285,7 @@ export async function userDetails(req: Request, res: Response) {
     }
     let userDetails = await Owner.findOne({
       userEmail: user,
-    }).select("userName userEmail");
+    }).select("firstName lastName userName userEmail");
     res.status(200).json({
       userDetails,
     });

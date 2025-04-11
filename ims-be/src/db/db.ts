@@ -5,16 +5,36 @@ mongoose.connect(
 );
 
 const staffSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
   userName: String,
   userEmail: String,
   userPassword: String,
   userType: {
     type: String,
-    enum: ["staff", "manager"],
+    enum: ["staff"],
+  },
+  supervisor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Manager",
+  },
+});
+
+const managerSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  userName: String,
+  userEmail: String,
+  userPassword: String,
+  userType: {
+    type: String,
+    enum: ["manager"],
   },
 });
 
 const ownerSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
   userName: String,
   userEmail: String,
   userPassword: String,
@@ -35,9 +55,13 @@ const orderSchema = new mongoose.Schema({
   Date: Date,
   Status: String,
   DeliveryMethod: String,
-  CustomerId: {
+  Customer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",
+  },
+  Employee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Staff",
   },
 });
 
@@ -85,6 +109,7 @@ export const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 export const Owner = mongoose.model("Owner", ownerSchema);
 export const Staff = mongoose.model("Staff", staffSchema);
 export const Supplier = mongoose.model("Supplier", supplierSchema);
+export const Manager = mongoose.model("Manager", managerSchema);
 
 module.exports = {
   Product,
@@ -94,4 +119,5 @@ module.exports = {
   Owner,
   Staff,
   Supplier,
+  Manager,
 };

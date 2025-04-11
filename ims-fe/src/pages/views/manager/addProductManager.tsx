@@ -5,7 +5,7 @@ import { PlusCircle } from "lucide-react";
 import { Input } from "../../../components/ui/input";
 import toast from "react-hot-toast";
 
-export default function AddProduct() {
+export default function AddProductManager() {
   const [formData, setFormData] = useState({
     Name: "",
     Description: "",

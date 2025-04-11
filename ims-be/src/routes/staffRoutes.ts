@@ -12,6 +12,9 @@ import {
   totalOrder,
   getSupplier,
   totalSupplier,
+  createOrder,
+  getOrder,
+  createOrderManual,
 } from "../controller/staffController";
 import staffMiddleware from "../middleware/staffMiddleware";
 
@@ -33,5 +36,8 @@ staffRouter.get("/total-products", staffMiddleware, totalProductStaff);
 staffRouter.get("/total-orders", staffMiddleware, totalOrder);
 staffRouter.get("/suppliers", staffMiddleware, getSupplier);
 staffRouter.get("/total-suppliers", staffMiddleware, totalSupplier);
+staffRouter.get("/create-orders", staffMiddleware, createOrder);
+staffRouter.get("/orders", staffMiddleware, getOrder);
+staffRouter.post("/create-order", staffMiddleware, createOrderManual)
 
 export { staffRouter };

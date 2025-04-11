@@ -53,8 +53,14 @@ const customerSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   Date: Date,
-  Status: String,
-  DeliveryMethod: String,
+  Status: {
+    type: String,
+    enum: ["Pending", "Processing", "Completed", "Cancelled"],
+  },
+  DeliveryMethod: {
+    type: String,
+    enum: ["Pickup", "Home Delivery"],
+  },
   Customer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",
@@ -63,6 +69,7 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Staff",
   },
+  ExternalOrderId: String,
 });
 
 const productSchema = new mongoose.Schema({
@@ -93,6 +100,7 @@ const orderItemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Order",
   },
+  TotalPrice: mongoose.Types.Decimal128,
 });
 
 const supplierSchema = new mongoose.Schema({

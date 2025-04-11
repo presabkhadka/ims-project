@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function StaffNavbar() {
   interface User {
+    firstName: string;
+    lastName: string;
     userName: string;
     userEmail: string;
   }
@@ -69,6 +71,9 @@ export default function StaffNavbar() {
           <PopoverContent>
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2">
+                <p className="text-sm text-slate-600 dark:text-white">
+                  Full Name: {user?.firstName + " " + user?.lastName}
+                </p>
                 <p className="text-sm text-slate-600 dark:text-white">
                   Name: {user?.userName}
                 </p>

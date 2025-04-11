@@ -27,6 +27,8 @@ import AddProductManager from "./pages/views/manager/addProductManager";
 import StocksManager from "./pages/views/manager/managerStocks";
 import SuppliersManager from "./pages/views/manager/managerSuppliers";
 import AddSuppliersManager from "./pages/views/manager/managerAddSuppliers";
+import OwnerOrders from "./pages/views/owner/ownerOrders";
+import StaffOrders from "./pages/views/staff/staffOrders";
 
 function App() {
   return (
@@ -73,6 +75,10 @@ function App() {
                 path: "/owner/add-suppliers",
                 element: <AddSuppliers />,
               },
+              {
+                path: "/owner/orders",
+                element: <OwnerOrders />,
+              },
             ],
           },
           {
@@ -94,6 +100,10 @@ function App() {
               {
                 path: "/staff/suppliers",
                 element: <StaffSuppliers />,
+              },
+              {
+                path: "/staff/orders",
+                element: <StaffOrders />,
               },
             ],
           },
